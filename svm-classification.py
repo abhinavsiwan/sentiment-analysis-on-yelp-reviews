@@ -4,6 +4,7 @@ from sklearn import metrics, model_selection
 from sklearn.svm import SVC
 from sklearn.multiclass import OneVsRestClassifier
 from utils import create_tags, create_tf_idf_matrix, remove_stopwords, tokenize_review
+from nltk import word_tokenize
 
 
 def classification(train_vecs, train_tags):
@@ -21,60 +22,63 @@ def classification(train_vecs, train_tags):
 
 
 def main():
-    f = open("yelp_academic_dataset_review.json")
-    line = f.readline()
-    map_sentiment = {}
-    map_star = {}
-    review_list = []
-    i = 1
-    while line:
-        try:
-            line = f.readline()
-            review = json.loads(line)
-            index = i
-            star = review["stars"]
-            text = review["text"]
-            if star > 3:
-                sentiment = '1.0'  # positive
-            else:
-                sentiment = '0.0'  # negative
-            map_sentiment[index] = sentiment
-            map_star[index] = star
-            review_list.append([index, text])
-            i += 1
-            if i == 100:
-                break
-        except:
-            print(line)
-    f.close()
-    print("Dataset Loaded...")
-    tokenized_words = tokenize_review(review_list)
-    print("Reviews Tokenized...")
-    print("Classification without any processing")
-    print("#" * 70)
+    with open("raw-data/training.json") as f:
+        line = f.readline()
+        map_sentiment = {}
+        map_star = {}
+        tokenized_words = {}
+        i = 0
+        while line:
+            try:
+                review = json.loads(line)
+                line = f.readline()
+                star = review["stars"]
+                text = review["text"]
+                if star > 3:
+                    sentiment = '1.0'  # positive
+                else:
+                    sentiment = '0.0'  # negative
+                map_sentiment[i] = sentiment
+                map_star[i] = star
+                tokenized_words[i] = word_tokenize(text)
+                i += 1
+            except:
+                print(line)
+    training_dataset = [map_sentiment, map_star, tokenized_words]
+    with open("processed-data/training-dataset.json", "w") as f:
+        f.write(json.dumps(training_dataset))
+    # print("Classification without any processing")
+    # print("#" * 70)
     lexicon, tf_vector = create_tf_idf_matrix(tokenized_words)
-    print("TF Matrix Created...")
-    print("length of vector : ", len(tf_vector[1]))
-    tags = create_tags(map_sentiment)
-    train_vecs = np.array(list(tf_vector.values()))
-    train_tags = np.array(list(tags))
-    classification(train_vecs, train_tags)
-    print("#" * 70)
-    print("Classification after removing stop words")
-    print("#" * 70)
+    with open("processed-data/tf-idf-matrix.json", "w") as f:
+        f.write(json.dumps([list(lexicon), tf_vector]))
+    # print("TF Matrix Created...")
+    # print("length of vector : ", len(tf_vector[1]))
+    # tags = create_tags(map_sentiment)
+    # train_vecs = np.array(list(tf_vector.values()))
+    # train_tags = np.array(list(tags))
+    # classification(train_vecs, train_tags)
+    # print("#" * 70)
+
+
+    # print("Classification after removing stop words")
+    # print("#" * 70)
     tokenized_words = remove_stopwords(tokenized_words)
     lexicon, tf_vector = create_tf_idf_matrix(tokenized_words)
-    print("TF Matrix Created...")
-    print("length of vector : ", len(tf_vector[1]))
-    train_vecs = np.array(list(tf_vector.values()))
-    train_tags = np.array(list(map_sentiment.values()))
-    classification(train_vecs, train_tags)
-    print("#" * 70)
-    print("Classification into 5 Classes")
-    print("#" * 70)
-    tags = create_tags(map_star)
-    train_tags = np.array(list(tags))
-    classification(train_vecs, train_tags)
+    with open("processed-data/tf-idf-matrix-stopwords.json", "w") as f:
+        f.write(json.dumps([list(lexicon), tf_vector]))
+    # print("TF Matrix Created...")
+    # print("length of vector : ", len(tf_vector[1]))
+    # train_vecs = np.array(list(tf_vector.values()))
+    # train_tags = np.array(list(map_sentiment.values()))
+    # classification(train_vecs, train_tags)
+    # print("#" * 70)
+
+    # print("Classification into 5 Classes")
+    # print("#" * 70)
+    # tags = create_tags(map_star)
+    # train_tags = np.array(list(tags))
+    # classification(train_vecs, train_tags)
 
 
 if __name__ == "__main__":

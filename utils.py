@@ -3,7 +3,7 @@ from nltk.corpus import stopwords
 
 
 def remove_stopwords(tokenized_words):
-    for i in range(1, len(tokenized_words) + 1):
+    for i in range(len(tokenized_words)):
         filtered_words = [word for word in tokenized_words[i] if word not in stopwords.words('english')]
         tokenized_words[i] = filtered_words
     return tokenized_words
@@ -18,7 +18,7 @@ def tokenize_review(review_list):
 
 def build_lexicon(tokenized_word):
     lexicon = set()
-    for i in range(1, len(tokenized_word) + 1):
+    for i in range(len(tokenized_word)):
         lexicon.update(tokenized_word[i])
     return lexicon
 
@@ -30,7 +30,7 @@ def tf(word, tokenized_words):
 def create_tf_idf_matrix(tokenized_words):
     lexicon = build_lexicon(tokenized_words)
     tf_vector = {}
-    for i in range(1, len(tokenized_words) + 1):
+    for i in range(len(tokenized_words)):
         tf_vector[i] = [tf(word, tokenized_words[i]) for word in lexicon]
     return lexicon, tf_vector
 
