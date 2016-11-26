@@ -3,7 +3,6 @@ import numpy as np
 from sklearn import metrics, model_selection
 from sklearn.svm import SVC
 from sklearn.multiclass import OneVsRestClassifier
-from utils import create_tags
 
 
 def classification(train_vecs, train_tags):
@@ -29,31 +28,30 @@ def main():
     print("Classification without any processing")
     print("#" * 70)
     with open("processed-data/tf-idf-matrix.json", "r") as f:
-        data = json.loads(f.read())
-        tf_vector = data[1]
+        tf_vector = json.loads(f.read())
 
-    tags = create_tags(map_sentiment)
+    tags = map_sentiment.values()
     train_vecs = np.array(list(tf_vector.values()))
     train_tags = np.array(list(tags))
     classification(train_vecs, train_tags)
     print("#" * 70)
 
-    print("Classification after removing stop words")
-    print("#" * 70)
-    with open("processed-data/tf-idf-matrix-stopwords.json", "r") as f:
-        data = json.loads(f.read())
-        tf_vector = data[1]
-    print("TF Matrix Created...")
-    train_vecs = np.array(list(tf_vector.values()))
-    train_tags = np.array(list(map_sentiment.values()))
-    classification(train_vecs, train_tags)
-    print("#" * 70)
-
-    print("Classification into 5 Classes")
-    print("#" * 70)
-    tags = create_tags(map_star)
-    train_tags = np.array(list(tags))
-    classification(train_vecs, train_tags)
+    # print("Classification after removing stop words")
+    # print("#" * 70)
+    # with open("processed-data/tf-idf-matrix-stopwords.json", "r") as f:
+    #     tf_vector = json.loads(f.read())
+    #
+    # print("TF Matrix Created...")
+    # train_vecs = np.array(list(tf_vector.values()))
+    # train_tags = np.array(list(map_sentiment.values()))
+    # classification(train_vecs, train_tags)
+    # print("#" * 70)
+    #
+    # print("Classification into 5 Classes")
+    # print("#" * 70)
+    # tags = map_star.values()
+    # train_tags = np.array(list(tags))
+    # classification(train_vecs, train_tags)
 
 
 if __name__ == "__main__":
