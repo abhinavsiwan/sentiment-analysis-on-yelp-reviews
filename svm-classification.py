@@ -6,11 +6,10 @@ import pickle
 file_prefix = "processed-data/"
 
 
-
 def train(train_vecs, train_tags):
-    clf = OneVsRestClassifier(svm.SVC(C=1, kernel='linear', gamma=1, verbose=False, probability=False))
+    clf = svm.SVC(C=1, kernel='linear', gamma=1, verbose=False, probability=False)
     clf.fit(train_vecs, train_tags)
-    with open("intermediate/svm_trained_dumps.bin", 'wb') as fs:
+    with open("intermediate/svm_trained_dumps_adarsh.bin", 'wb') as fs:
         fs.write(pickle.dumps(clf))
     print("Classifier Trained...")
     return clf
@@ -33,9 +32,8 @@ def main():
     with open(file_prefix + "tf-idf-matrix.json", "r") as f:
         tf_vector_train = json.loads(f.read())
 
-    tags = map_sentiment_train.values()
-    train_vecs = np.array(list(tf_vector_train.values()))
-    train_tags = np.array(list(tags))
+    train_vecs = np.array(tf_vector_train)
+    train_tags = np.array(map_sentiment_train)
     clf = train(train_vecs, train_tags)
     print("#" * 70)
     print("Training completed\n\n")
@@ -48,10 +46,9 @@ def main():
     print("#" * 70)
     with open(file_prefix + "dev-tf-idf-matrix.json", "r") as f:
         tf_vector_dev = json.loads(f.read())
-    print(len(tf_vector_dev["0"]))
-    tags = map_sentiment_dev.values()
-    dev_vecs = np.array(list(tf_vector_dev.values()))
-    dev_tags = np.array(list(tags))
+
+    dev_vecs = np.array(tf_vector_dev)
+    dev_tags = np.array(map_sentiment_dev)
     print("Classifying.....")
     classify(clf, dev_vecs, dev_tags)
 

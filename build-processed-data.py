@@ -1,24 +1,24 @@
 import json
 from utils import create_tf_idf_matrix, build_count_dict
-file_prefix = "processed-data/1000/"
+file_prefix = "processed-data/"
 
 
 def main(ftype):
     file = "raw-data/train.json" if ftype == "train" else "raw-data/dev.json"
     with open(file, 'r') as f:
         data = json.loads(f.read())
-        map_sentiment = {}
-        tokens_count = {}
+        map_sentiment = []
+        tokens_count = []
         i = 0
         for record in data:
             try:
                 sentiment = record["sentiment"]
                 tokens = record["tokens"]
-                map_sentiment[i] = sentiment
-                tokens_count[i] = build_count_dict(tokens)
+                map_sentiment.append(sentiment)
+                tokens_count.append(build_count_dict(tokens))
                 i += 1
-                if i == 1000:
-                    break
+                # if i == 5000:
+                #     break
             except:
                 print(record)
 
