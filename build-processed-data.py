@@ -1,50 +1,39 @@
 import json
-from utils import create_tf_idf_matrix, remove_stopwords, build_dict
+from utils import create_tf_idf_matrix, build_count_dict
 
 
-def main():
-    with open("raw-data/training.json") as f:
-        line = f.readline()
+def main(type):
+    file = "raw-data/train.json" if type == "train" else "raw-data/dev.json"
+    with open(file, 'r') as f:
+        data = json.loads(f.read())
         map_sentiment = {}
-        map_star = {}
-        tokenized_words = {}
+        tokens_count = {}
         i = 0
-        while line:
+        for record in data:
             try:
-                review = json.loads(line)
-                line = f.readline()
-                star = review["stars"]
-                text = review["text"]
-                if star > 3:
-                    sentiment = '1.0'  # positive
-                else:
-                    sentiment = '0.0'  # negative
+                sentiment = record["sentiment"]
+                tokens = record["tokens"]
                 map_sentiment[i] = sentiment
-                map_star[i] = star
-                tokenized_words[i] = build_dict(text)
+                tokens_count[i] = build_count_dict(tokens)
                 i += 1
-                if i == 500:
-                    break
+                # if i == 1000:
+                #     break
             except:
-                print(line)
+                print(record)
 
-    training_dataset = [map_sentiment, map_star]
-    with open("processed-data/training-dataset.json", "w") as f:
-        f.write(json.dumps(training_dataset))
+    file = "processed-data/training-dataset.json" if type == "train" else "processed-data/dev-dataset.json"
+    with open(file, "w") as f:
+        f.write(json.dumps(map_sentiment))
 
-    lexicon, tf_vector = create_tf_idf_matrix(tokenized_words)
-    with open("processed-data/tf-idf-matrix.json", "w") as f:
+    lexicon, tf_vector = create_tf_idf_matrix(tokens_count)
+    file = "processed-data/tf-idf-matrix.json" if type == "train" else "processed-data/dev_tf-idf-matrix.json"
+    with open(file, "w") as f:
         f.write(json.dumps(tf_vector))
-
-    # tokenized_words = remove_stopwords(tokenized_words)
-    # lexicon, tf_vector = create_tf_idf_matrix(tokenized_words)
-    # with open("processed-data/tf-idf-matrix-stopwords.json", "w") as f:
-    #     f.write(json.dumps(tf_vector))
 
 
 if __name__ == "__main__":
     import timeit
     start = timeit.default_timer()
-    main()
+    main("train")
     end = timeit.default_timer()
     print("\n Time taken: " + str(end - start))
