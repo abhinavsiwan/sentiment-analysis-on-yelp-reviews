@@ -1,20 +1,6 @@
-from nltk.corpus import stopwords
 import nltk
 import re
-
-
-def remove_stopwords(tokenized_words):
-    for i in range(len(tokenized_words)):
-        filtered_words = {word: count for (word, count) in tokenized_words[i].items() if word not in stopwords.words('english')}
-        tokenized_words[i] = filtered_words
-    return tokenized_words
-
-
-def tokenize_review(review_list):
-    tokenized_words = {}
-    for review in review_list:
-        tokenized_words[review[0]] = tokenize(review[1])
-    return tokenized_words
+import pickle
 
 
 def build_lexicon(tokenized_word):
@@ -24,8 +10,14 @@ def build_lexicon(tokenized_word):
     return lexicon
 
 
-def create_tf_idf_matrix(tokenized_words):
-    lexicon = build_lexicon(tokenized_words)
+def create_tf_idf_matrix(tokenized_words, ftype):
+    if ftype == "train":
+        lexicon = build_lexicon(tokenized_words)
+        with open("intermediate/lexicon.bin", 'wb') as fs:
+            fs.write(pickle.dumps(lexicon))
+    else:
+        with open("intermediate/lexicon.bin", 'rb') as fs:
+            lexicon = pickle.loads(fs.read())
     tf_vector = {}
     for i in range(len(tokenized_words)):
         tf_vector[i] = [tokenized_words[i][word] if word in tokenized_words[i] else 0 for word in lexicon]
@@ -49,12 +41,11 @@ def tokenize(text):
     return ret_list
 
 
-def build_dict(text):
+def build_count_dict(tokens):
     map_text_count = {}
-    text = tokenize(text)
-    for t in text:
-        if t in map_text_count:
-            map_text_count[t] += 1
+    for token in tokens:
+        if token in map_text_count:
+            map_text_count[token] += 1
         else:
-            map_text_count[t] = 1
+            map_text_count[token] = 1
     return map_text_count

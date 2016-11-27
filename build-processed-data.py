@@ -1,9 +1,10 @@
 import json
 from utils import create_tf_idf_matrix, build_count_dict
+file_prefix = "processed-data/1000/"
 
 
-def main(type):
-    file = "raw-data/train.json" if type == "train" else "raw-data/dev.json"
+def main(ftype):
+    file = "raw-data/train.json" if ftype == "train" else "raw-data/dev.json"
     with open(file, 'r') as f:
         data = json.loads(f.read())
         map_sentiment = {}
@@ -16,17 +17,17 @@ def main(type):
                 map_sentiment[i] = sentiment
                 tokens_count[i] = build_count_dict(tokens)
                 i += 1
-                # if i == 1000:
-                #     break
+                if i == 1000:
+                    break
             except:
                 print(record)
 
-    file = "processed-data/training-dataset.json" if type == "train" else "processed-data/dev-dataset.json"
+    file = file_prefix + "training-dataset.json" if ftype == "train" else file_prefix + "dev-dataset.json"
     with open(file, "w") as f:
         f.write(json.dumps(map_sentiment))
 
-    lexicon, tf_vector = create_tf_idf_matrix(tokens_count)
-    file = "processed-data/tf-idf-matrix.json" if type == "train" else "processed-data/dev_tf-idf-matrix.json"
+    lexicon, tf_vector = create_tf_idf_matrix(tokens_count, ftype)
+    file = file_prefix + "tf-idf-matrix.json" if ftype == "train" else file_prefix + "dev-tf-idf-matrix.json"
     with open(file, "w") as f:
         f.write(json.dumps(tf_vector))
 
@@ -35,5 +36,6 @@ if __name__ == "__main__":
     import timeit
     start = timeit.default_timer()
     main("train")
+    main("dev")
     end = timeit.default_timer()
     print("\n Time taken: " + str(end - start))
