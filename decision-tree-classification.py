@@ -35,23 +35,24 @@ def main():
     tags = map_sentiment_train.values()
     train_vecs = np.array(list(tf_vector_train.values()))
     train_tags = np.array(list(tags))
-    # clf = train(train_vecs, train_tags)
-    # print("#" * 70)
-    # print("Training completed\n\n")
+    clf = train(train_vecs, train_tags)
+    print("#" * 70)
+    print("Training completed\n\n")
 
-    with open("intermediate/dt_trained_dumps.bin", 'rb') as fs:
-        clf = pickle.loads(fs.read())
+    # with open("intermediate/dt_trained_dumps.bin", 'rb') as fs:
+    #     clf = pickle.loads(fs.read())
 
     with open(file_prefix + "dev-dataset.json", "r") as f:
         map_sentiment_dev = json.loads(f.read())
     print("#" * 70)
     with open(file_prefix + "dev-tf-idf-matrix.json", "r") as f:
         tf_vector_dev = json.loads(f.read())
+    print(len(tf_vector_dev["0"]))
     tags = map_sentiment_dev.values()
     dev_vecs = np.array(list(tf_vector_dev.values()))
     dev_tags = np.array(list(tags))
     print("Classifying.....")
-    classify(clf, dev_vecs, dev_tags)
+    classify(clf, train_vecs, train_tags)
 
 
 if __name__ == "__main__":

@@ -3,13 +3,14 @@ import numpy as np
 from sklearn import metrics, svm
 from sklearn.multiclass import OneVsRestClassifier
 import pickle
-file_prefix = "processed-data/1000/"
+file_prefix = "processed-data/"
+
 
 
 def train(train_vecs, train_tags):
     clf = OneVsRestClassifier(svm.SVC(C=1, kernel='linear', gamma=1, verbose=False, probability=False))
     clf.fit(train_vecs, train_tags)
-    with open("intermediate_dt_trained_dumps.bin", 'wb') as fs:
+    with open("intermediate/svm_trained_dumps.bin", 'wb') as fs:
         fs.write(pickle.dumps(clf))
     print("Classifier Trained...")
     return clf
@@ -21,8 +22,6 @@ def classify(clf, vecs, tags):
     print("precision score: ", metrics.precision_score(tags, predicted, pos_label=None, average='weighted'))
     print("recall score: ", metrics.recall_score(tags, predicted, pos_label=None, average='weighted'))
     print("classification_report: \n ", metrics.classification_report(tags, predicted))
-    # print("confusion_matrix:\n ", metrics.confusion_matrix(train_tags, predicted))
-    return
 
 
 def main():
@@ -41,29 +40,20 @@ def main():
     print("#" * 70)
     print("Training completed\n\n")
 
+    # with open("intermediate/dt_trained_dumps.bin", 'rb') as fs:
+    #     clf = pickle.loads(fs.read())
+
     with open(file_prefix + "dev-dataset.json", "r") as f:
         map_sentiment_dev = json.loads(f.read())
-    print("Classifying.....")
     print("#" * 70)
     with open(file_prefix + "dev-tf-idf-matrix.json", "r") as f:
         tf_vector_dev = json.loads(f.read())
+    print(len(tf_vector_dev["0"]))
     tags = map_sentiment_dev.values()
     dev_vecs = np.array(list(tf_vector_dev.values()))
     dev_tags = np.array(list(tags))
-    print(len(dev_vecs))
-    print(len(dev_tags))
+    print("Classifying.....")
     classify(clf, dev_vecs, dev_tags)
-
-    # print("Classification after removing stop words")
-    # print("#" * 70)
-    # with open("processed-data/tf-idf-matrix-stopwords.json", "r") as f:
-    #     tf_vector = json.loads(f.read())
-    # print("TF Matrix Created...")
-    # train_vecs = np.array(list(tf_vector.values()))
-    # train_tags = np.array(list(map_sentiment.values()))
-    # clf = train(train_vecs, train_tags)
-    # classify(clf, train_vecs, train_tags)
-    # print("#" * 70)
 
 
 if __name__ == "__main__":
