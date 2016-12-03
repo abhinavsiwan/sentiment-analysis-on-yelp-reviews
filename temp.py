@@ -122,29 +122,31 @@ import json
 # with open("yelp_reviews.json", 'w') as fs:
 #     fs.write(json.dumps(p_list[:13000]))
 
-from utils import tokenize
-
-import timeit
-start = timeit.default_timer()
-data = []
-reduced_data = []
-with open("yelp_reviews.json", 'r') as fs:
-    data = json.loads(fs.read())
-    import random
-    random.shuffle(data)
-    i = 0
-    #print(len(data))
-    for d in data:
-        dic = {}
-        dic["sentiment"] = 0 if d["stars"] < 3 else 1
-        dic["text"] = d["text"]
-        dic["tokens"] = tokenize(d["text"])
-        reduced_data.append(dic)
-        # if i == 5000:
-        #     break
-        # i+=1
-print(timeit.default_timer()-start)
-with open("raw-data/train.json", 'w') as train:
-    train.write(json.dumps(reduced_data[:10000]))
-with open("raw-data/dev.json", 'w') as train:
-    train.write(json.dumps(reduced_data[10000:]))
+# from utils import tokenizer
+#
+# import timeit
+# start = timeit.default_timer()
+# data = []
+# reduced_data = []
+#
+#
+# with open("yelp_reviews.json", 'r') as fs:
+#     data = json.loads(fs.read())
+#     import random
+#     random.shuffle(data)
+#     i = 0
+#     #print(len(data))
+#     for d in data:
+#         dic = {}
+#         dic["sentiment"] = 0 if d["stars"] < 3 else 1
+#         dic["text"] = d["text"]
+#         dic["tokens"] = tokenizer(d["text"])
+#         reduced_data.append(dic)
+#         # if i == 5000:
+#         #     break
+#         # i+=1
+# print(timeit.default_timer()-start)
+# with open("raw-data/train.json", 'w') as train:
+#     train.write(json.dumps(reduced_data[:10000]))
+# with open("raw-data/dev.json", 'w') as train:
+#     train.write(json.dumps(reduced_data[10000:]))

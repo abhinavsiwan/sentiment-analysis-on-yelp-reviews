@@ -1,13 +1,13 @@
 import json
 import numpy as np
 from sklearn import metrics, svm
-from sklearn.multiclass import OneVsRestClassifier
 import pickle
 file_prefix = "processed-data/"
 
 
 def train(train_vecs, train_tags):
-    clf = svm.SVC(C=1, kernel='linear', gamma=1, verbose=False, probability=False)
+    clf = svm.LinearSVC(dual=False, tol=0.0001, C=1.0, multi_class='ovr', fit_intercept=True, intercept_scaling=1,
+                    class_weight=None, verbose=0, random_state=None, max_iter=10000)
     clf.fit(train_vecs, train_tags)
     with open("intermediate/svm_trained_dumps_adarsh.bin", 'wb') as fs:
         fs.write(pickle.dumps(clf))

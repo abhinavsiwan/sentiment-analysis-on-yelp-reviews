@@ -9,16 +9,12 @@ def main(ftype):
         data = json.loads(f.read())
         map_sentiment = []
         tokens_count = []
-        i = 0
         for record in data:
             try:
                 sentiment = record["sentiment"]
                 tokens = record["tokens"]
                 map_sentiment.append(sentiment)
                 tokens_count.append(build_count_dict(tokens))
-                i += 1
-                # if i == 5000:
-                #     break
             except:
                 print(record)
 
